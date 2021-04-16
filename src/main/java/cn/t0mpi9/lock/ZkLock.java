@@ -29,16 +29,16 @@ public class ZkLock implements Lock, Serializable {
 
     private static final long serialVersionUID = -5349087034705521390L;
 
-    private static final Map<String, Sync> S_MAP = new ConcurrentHashMap<>();
+    private static final Map<String, Sync> SYNC_MAP = new ConcurrentHashMap<>();
 
     private Sync s;
 
     public ZkLock(CuratorFramework client, ZkLockConfig lockConfig) {
-        synchronized (S_MAP) {
-            s = S_MAP.get(lockConfig.getLockName());
+        synchronized (SYNC_MAP) {
+            s = SYNC_MAP.get(lockConfig.getLockName());
             if (Objects.isNull(s)) {
                 s = new FairSync(client, lockConfig);
-                S_MAP.put(lockConfig.getLockName(), s);
+                SYNC_MAP.put(lockConfig.getLockName(), s);
             }
         }
     }
