@@ -31,41 +31,41 @@ public class ZkLock implements Lock, Serializable {
 
     private static final Map<String, Sync> S_MAP = new ConcurrentHashMap<>();
 
-    private Sync s;
+    private Sync sync;
 
     public ZkLock(CuratorFramework client, ZkLockConfig lockConfig) {
         synchronized (S_MAP) {
-            s = S_MAP.get(lockConfig.getLockName());
-            if (Objects.isNull(s)) {
-                s = new FairSync(client, lockConfig);
-                S_MAP.put(lockConfig.getLockName(), s);
+            sync = S_MAP.get(lockConfig.getLockName());
+            if (Objects.isNull(sync)) {
+                sync = new FairSync(client, lockConfig);
+                S_MAP.put(lockConfig.getLockName(), sync);
             }
         }
     }
 
     @Override
     public void lock() {
-        s.lock();
+        sync.lock();
     }
 
     @Override
     public void lockInterruptibly() throws InterruptedException {
-        s.acquireInterruptibly(1);
+        sync.acquireInterruptibly(1);
     }
 
     @Override
     public boolean tryLock() {
-        return s.tryAcquire(1);
+        return sync.tryAcquire(1);
     }
 
     @Override
     public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
-        return s.tryAcquireNanos(1, unit.toNanos(time));
+        return sync.tryAcquireNanos(1, unit.toNanos(time));
     }
 
     @Override
     public void unlock() {
-        s.release(1);
+        sync.release(1);
     }
 
     @Override
